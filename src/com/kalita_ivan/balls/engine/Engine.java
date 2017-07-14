@@ -1,10 +1,12 @@
 package com.kalita_ivan.balls.engine;
 
 
+import com.kalita_ivan.balls.engine.modifiers.ModifierHandlerInterface;
+import com.kalita_ivan.balls.engine.modifiers.RigidBodyHandler;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.concurrent.ThreadLocalRandom;
 
 class Engine {
     private Scene scene;
@@ -12,13 +14,18 @@ class Engine {
     private Window window;
     private int width;
     private int height;
+    private long lastTickTime;
+    private ModifierHandlerInterface[] modifierHandlers;
 
     Engine(int width, int height) {
         this.width = width;
         this.height = height;
         this.createWindow();
 
-        this.scene = new Scene();
+        this.scene = new Scene(this.width, this.height);
+
+        this.modifierHandlers = new ModifierHandlerInterface[1];
+        this.modifierHandlers[0] = new RigidBodyHandler(this.scene);
     }
 
     private void createWindow() {
@@ -34,13 +41,7 @@ class Engine {
     void start() {
         try {
             for (int i = 0; i < 500; i++) {
-                int x = ThreadLocalRandom.current().nextInt(0, this.width);
-                int y = ThreadLocalRandom.current().nextInt(0, this.height);
-                int radius = ThreadLocalRandom.current().nextInt(0, 30);
-                int r = ThreadLocalRandom.current().nextInt(0, 255);
-                int g = ThreadLocalRandom.current().nextInt(0, 255);
-                int b = ThreadLocalRandom.current().nextInt(0, 255);
-                this.scene.addObject(new Ball(x, y, radius, new Color(r, g, b)));
+                this.scene.addObject(Ball.random(this.width, this.height));
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -52,17 +53,25 @@ class Engine {
     }
 
     private void tick(Graphics g) {
+        long currentTime = System.nanoTime();
+        double delta = (this.lastTickTime == 0 ? 0 : currentTime - this.lastTickTime) * 1e-9f;
         this.processInput();
-        this.update();
+        this.update(delta);
         this.render(g);
+        this.lastTickTime = currentTime;
     }
 
     private void processInput() {
 
     }
 
-    private void update() {
-
+    private void update(double delta) {
+        for (int i = 0; i < scene.getObjectsCount(); i++) {
+            GameObjectInterface object = scene.objectAt(i);
+            for (int j = 0; j < this.modifierHandlers.length; j++) {
+                this.modifierHandlers[j].update(object.getModifiers(), delta);
+            }
+        }
     }
 
     private void render(Graphics g) {

@@ -1,13 +1,17 @@
 package com.kalita_ivan.balls.engine;
 
 
-class Scene {
+public class Scene {
     final private static int MAX_OBJECTS_COUNT = 1000;
 
     private GameObjectInterface[] objects;
     private int objectsCount = 0;
+    private double width;
+    private double height;
 
-    Scene() {
+    Scene(double width, double height) {
+        this.width = width;
+        this.height = height;
         this.objects = new GameObjectInterface[Scene.MAX_OBJECTS_COUNT];
     }
 
@@ -28,5 +32,13 @@ class Scene {
 
     int getObjectsCount() {
         return this.objectsCount;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
     }
 }
