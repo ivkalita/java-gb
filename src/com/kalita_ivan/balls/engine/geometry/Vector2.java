@@ -36,4 +36,8 @@ public class Vector2 implements Cloneable {
     public Vector2 multiply(double multiplier) {
         return new Vector2(this.x * multiplier, this.y * multiplier);
     }
+
+    public double length() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    }
 }

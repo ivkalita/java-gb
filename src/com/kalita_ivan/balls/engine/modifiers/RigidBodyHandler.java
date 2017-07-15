@@ -4,9 +4,11 @@ import com.kalita_ivan.balls.engine.Scene;
 import com.kalita_ivan.balls.engine.geometry.Vector2;
 
 public class RigidBodyHandler extends AbstractModifierHandler implements ModifierHandlerInterface {
+    private double maxAllowedSpeed;
 
-    public RigidBodyHandler(Scene scene) {
+    public RigidBodyHandler(Scene scene, double maxAllowedSpeed) {
         this.scene = scene;
+        this.maxAllowedSpeed = maxAllowedSpeed;
     }
 
     @Override
@@ -43,6 +45,11 @@ public class RigidBodyHandler extends AbstractModifierHandler implements Modifie
         }
 
         r.setPosition(pos);
+
+        double absSpeed = speed.length();
+        if (absSpeed > this.maxAllowedSpeed) {
+            speed = speed.multiply(this.maxAllowedSpeed / absSpeed);
+        }
         r.setSpeed(speed);
         r.setAcceleration(acceleration);
     }

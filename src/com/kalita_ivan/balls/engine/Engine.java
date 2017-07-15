@@ -1,32 +1,50 @@
 package com.kalita_ivan.balls.engine;
 
+import com.kalita_ivan.balls.engine.events.ClickEvent;
+import com.kalita_ivan.balls.engine.events.InputEvent;
+import com.kalita_ivan.balls.engine.events.InputEvents;
 import com.kalita_ivan.balls.engine.geometry.Vector2;
 import com.kalita_ivan.balls.engine.modifiers.TransitionHandler;
 import com.kalita_ivan.balls.engine.modifiers.ModifierHandlerInterface;
 import com.kalita_ivan.balls.engine.modifiers.RigidBodyHandler;
 import com.kalita_ivan.balls.engine.objects.Background;
-import com.kalita_ivan.balls.engine.objects.Ball;
+import com.kalita_ivan.balls.engine.objects.BallFactory;
 import com.kalita_ivan.balls.engine.objects.GameObjectInterface;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 class Engine {
     private Scene scene;
     private Canvas canvas;
     private Window window;
+    private InputEvents events;
+    private BallFactory ballFactory;
+
     private int width;
     private int height;
     private long lastTickTime;
+    private int initialBallsCount;
+    private double maxAllowedBallSpeed;
+    private int msPerTick;
+
     private ModifierHandlerInterface[] modifierHandlers;
 
-    Engine(int width, int height) {
+    Engine(int width, int height, int initialBallsCount, double maxAllowedBallSpeed, int msPerTick) {
         this.width = width;
         this.height = height;
+        this.initialBallsCount = initialBallsCount;
+        this.maxAllowedBallSpeed = maxAllowedBallSpeed;
+        this.msPerTick = msPerTick;
+        this.ballFactory = new BallFactory();
+
         this.createWindow();
         this.createScene();
         this.createHandlers();
+        this.createInputEvents();
     }
 
     private void createWindow() {
@@ -37,6 +55,13 @@ class Engine {
             }
         });
         this.window.add(this.canvas);
+        Engine engine = this;
+        this.canvas.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                engine.events.add(new ClickEvent(engine.lastTickTime, e.getX(), e.getY()));
+            }
+        });
     }
 
     private void createScene() {
@@ -45,21 +70,26 @@ class Engine {
 
     private void createHandlers() {
         this.modifierHandlers = new ModifierHandlerInterface[2];
-        this.modifierHandlers[0] = new RigidBodyHandler(this.scene);
+        this.modifierHandlers[0] = new RigidBodyHandler(this.scene, this.maxAllowedBallSpeed);
         this.modifierHandlers[1] = new TransitionHandler();
     }
 
+    private void createInputEvents() {
+        this.events = new InputEvents();
+    }
+
     void start() {
+        Vector2 dimensions = new Vector2(this.width, this.height);
         try {
-            this.scene.addObject(new Background(new Vector2(this.width, this.height)));
-            for (int i = 0; i < 500; i++) {
-                this.scene.addObject(Ball.random(this.width, this.height));
+            this.scene.addObject(new Background(dimensions));
+            for (int i = 0; i < this.initialBallsCount; i++) {
+                this.scene.addObject(this.ballFactory.createRandomBall(this.width, this.height));
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
-        Timer timer = new Timer(20, (ActionEvent evt) -> this.canvas.repaint());
+        Timer timer = new Timer(this.msPerTick, (ActionEvent evt) -> this.canvas.repaint());
         timer.start();
     }
 
@@ -73,7 +103,18 @@ class Engine {
     }
 
     private void processInput() {
-
+        for (int i = 0; i < this.events.count(); i++) {
+            InputEvent ev = this.events.objectAt(i);
+            if (ev instanceof ClickEvent) {
+                Vector2 pos = ((ClickEvent) ev).getPosition();
+                try {
+                    this.scene.addObject(this.ballFactory.createRandomBallAt(pos));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        this.events.clear();
     }
 
     private void update(double delta) {
