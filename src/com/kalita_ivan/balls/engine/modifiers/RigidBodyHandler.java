@@ -1,6 +1,5 @@
 package com.kalita_ivan.balls.engine.modifiers;
 
-
 import com.kalita_ivan.balls.engine.Scene;
 import com.kalita_ivan.balls.engine.geometry.Vector2;
 

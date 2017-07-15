@@ -1,10 +1,8 @@
 package com.kalita_ivan.balls.engine;
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
-
 
 class Canvas extends JPanel {
     private ActionListener onRepaint;

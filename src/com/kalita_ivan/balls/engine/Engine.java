@@ -1,8 +1,12 @@
 package com.kalita_ivan.balls.engine;
 
-
+import com.kalita_ivan.balls.engine.geometry.Vector2;
+import com.kalita_ivan.balls.engine.modifiers.TransitionHandler;
 import com.kalita_ivan.balls.engine.modifiers.ModifierHandlerInterface;
 import com.kalita_ivan.balls.engine.modifiers.RigidBodyHandler;
+import com.kalita_ivan.balls.engine.objects.Background;
+import com.kalita_ivan.balls.engine.objects.Ball;
+import com.kalita_ivan.balls.engine.objects.GameObjectInterface;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,11 +25,8 @@ class Engine {
         this.width = width;
         this.height = height;
         this.createWindow();
-
-        this.scene = new Scene(this.width, this.height);
-
-        this.modifierHandlers = new ModifierHandlerInterface[1];
-        this.modifierHandlers[0] = new RigidBodyHandler(this.scene);
+        this.createScene();
+        this.createHandlers();
     }
 
     private void createWindow() {
@@ -38,8 +39,19 @@ class Engine {
         this.window.add(this.canvas);
     }
 
+    private void createScene() {
+        this.scene = new Scene(this.width, this.height);
+    }
+
+    private void createHandlers() {
+        this.modifierHandlers = new ModifierHandlerInterface[2];
+        this.modifierHandlers[0] = new RigidBodyHandler(this.scene);
+        this.modifierHandlers[1] = new TransitionHandler();
+    }
+
     void start() {
         try {
+            this.scene.addObject(new Background(new Vector2(this.width, this.height)));
             for (int i = 0; i < 500; i++) {
                 this.scene.addObject(Ball.random(this.width, this.height));
             }
@@ -48,7 +60,6 @@ class Engine {
         }
 
         Timer timer = new Timer(20, (ActionEvent evt) -> this.canvas.repaint());
-        this.canvas.repaint();
         timer.start();
     }
 

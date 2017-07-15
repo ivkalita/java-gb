@@ -1,5 +1,6 @@
 package com.kalita_ivan.balls.engine;
 
+import com.kalita_ivan.balls.engine.objects.GameObjectInterface;
 
 public class Scene {
     final private static int MAX_OBJECTS_COUNT = 1000;

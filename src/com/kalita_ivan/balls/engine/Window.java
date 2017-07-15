@@ -1,6 +1,5 @@
 package com.kalita_ivan.balls.engine;
 
-
 import javax.swing.*;
 import java.awt.*;
 

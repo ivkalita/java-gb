@@ -3,7 +3,6 @@ package com.kalita_ivan.balls.engine;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-
 class PaintEvent extends ActionEvent {
     private Graphics g;
 

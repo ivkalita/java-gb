@@ -1,6 +1,5 @@
 package com.kalita_ivan.balls.engine.geometry;
 
-
 public class Vector2 implements Cloneable {
     private double x;
     private double y;
@@ -34,15 +33,7 @@ public class Vector2 implements Cloneable {
         return new Vector2(this.x + that.x, this.y + that.y);
     }
 
-    public Vector2 multiply(Vector2 that) {
-        return new Vector2(this.x * that.x, this.y * that.y);
-    }
-
     public Vector2 multiply(double multiplier) {
         return new Vector2(this.x * multiplier, this.y * multiplier);
-    }
-
-    public Vector2 multiply(double x, double y) {
-        return new Vector2(this.x * x, this.y * y);
     }
 }
